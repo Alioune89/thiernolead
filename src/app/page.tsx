@@ -22,8 +22,9 @@ import {
   MessageSquare,
   Lock,
   Download,
-  Mic,
 } from 'lucide-react'
+
+export const dynamic = 'force-dynamic'
 
 export default function LandingPage() {
   return (
