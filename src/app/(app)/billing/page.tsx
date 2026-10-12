@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Check, Coins, Zap, ShieldCheck, ArrowRight, Sparkles, Smartphone, CreditCard, History } from 'lucide-react'
+import { Check, Coins, Zap, ShieldCheck, ArrowRight, Sparkles, Smartphone, CreditCard, History, AlertCircle } from 'lucide-react'
 import { connection } from 'next/server'
 
 const PACKS = [
@@ -73,8 +73,13 @@ const PAYMENT_METHODS = [
   { name: 'Visa / Mastercard', color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' },
 ]
 
-export default async function BillingPage() {
+interface BillingPageProps {
+  searchParams?: Promise<{ error?: string }>
+}
+
+export default async function BillingPage({ searchParams }: BillingPageProps) {
   await connection()
+  const resolvedSearchParams = searchParams ? await searchParams : {}
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -96,7 +101,21 @@ export default async function BillingPage() {
     .limit(10)
 
   return (
-    <div className="container max-w-7xl mx-auto py-10 px-4 md:px-8 space-y-12">
+    <div className="container max-w-7xl mx-auto py-10 px-4 md:px-8 space-y-10">
+      {/* Alerte Crédits Insuffisants */}
+      {resolvedSearchParams.error === 'insufficient_credits' && (
+        <div className="p-4 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-200 flex items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
+          <div className="p-2 rounded-xl bg-amber-500/20 text-amber-400 shrink-0">
+            <AlertCircle className="w-5 h-5" />
+          </div>
+          <div>
+            <h4 className="font-bold text-sm text-white">Crédits de prospection épuisés</h4>
+            <p className="text-xs text-amber-200/90 mt-0.5">
+              Votre solde est insuffisant pour lancer cette recherche. Choisissez un pack de crédits ci-dessous pour démarrer vos extractions immédiatement.
+            </p>
+          </div>
+        </div>
+      )}
       {/* En-tête avec Solde */}
       <div className="relative overflow-hidden rounded-3xl p-8 bg-gradient-to-br from-white/[0.07] to-white/[0.02] border border-white/10 shadow-2xl backdrop-blur-xl">
         <div className="absolute -right-20 -top-20 w-80 h-80 bg-[#E55B5B]/15 rounded-full blur-3xl pointer-events-none" />

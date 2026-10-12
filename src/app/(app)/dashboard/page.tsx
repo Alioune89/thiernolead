@@ -28,7 +28,14 @@ export default async function DashboardPage() {
 
   const adminSupabase = createAdminClient()
 
-  // 1. Récupérer l'historique des recherches
+  // 1. Récupérer le profil et crédits
+  const { data: profile } = await adminSupabase
+    .from('profiles')
+    .select('credits')
+    .eq('id', user.id)
+    .single()
+
+  // 2. Récupérer l'historique des recherches
   const { data: searches } = await adminSupabase
     .from('searches')
     .select('*')
@@ -36,7 +43,7 @@ export default async function DashboardPage() {
     .order('created_at', { ascending: false })
     .limit(10)
 
-  // 2. Calcul des métriques globales
+  // 3. Calcul des métriques globales
   const totalLeadsExtracted = searches?.reduce((acc, s) => acc + (s.results_count || 0), 0) || 0
   const uniqueCountriesCount = new Set(searches?.map((s) => s.pays) || []).size
   const successfulSearches = searches?.filter((s) => s.statut === 'succeeded').length || 0
@@ -116,7 +123,7 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start w-full">
         {/* Formulaire de recherche interactif */}
         <div className="lg:col-span-5 w-full">
-          <SearchForm />
+          <SearchForm userCredits={profile?.credits ?? 0} />
         </div>
 
         {/* Historique des recherches */}

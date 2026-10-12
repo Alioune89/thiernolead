@@ -23,10 +23,15 @@ import {
   Lock,
   Download,
 } from 'lucide-react'
+import { createClient } from '@/lib/supabase/server'
 
 export const dynamic = 'force-dynamic'
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  const targetHref = user ? '/dashboard' : '/login'
+
   return (
     <div className="min-h-screen bg-[#082115] text-white flex flex-col selection:bg-[#E55B5B] selection:text-white w-full max-w-[100vw] overflow-x-hidden">
       {/* Navbar Flottante */}
@@ -58,14 +63,14 @@ export default function LandingPage() {
 
           <div className="flex items-center gap-1.5 sm:gap-4 shrink-0">
             <Link
-              href="/login"
+              href={targetHref}
               className="text-xs sm:text-sm font-semibold text-slate-300 hover:text-white transition-colors px-2 sm:px-3 py-1.5 sm:py-2 whitespace-nowrap"
             >
-              Connexion
+              {user ? 'Dashboard' : 'Connexion'}
             </Link>
-            <Link href="/login">
+            <Link href={targetHref}>
               <Button className="bg-[#E55B5B] hover:bg-[#d64a4a] text-white font-bold text-xs sm:text-sm px-2.5 sm:px-5 h-8 sm:h-11 rounded-xl shadow-lg shadow-[#E55B5B]/25 hover:scale-105 transition-all whitespace-nowrap">
-                <span>Essai Gratuit</span>
+                <span>{user ? 'Mon Cockpit' : 'Essai Gratuit'}</span>
                 <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-1.5" />
               </Button>
             </Link>
@@ -101,12 +106,12 @@ export default function LandingPage() {
 
           {/* CTA & Trust */}
           <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full px-2 sm:px-0 sm:w-auto">
-            <Link href="/login" className="w-full sm:w-auto">
+            <Link href={targetHref} className="w-full sm:w-auto">
               <Button
                 size="lg"
                 className="w-full sm:w-auto text-sm sm:text-lg h-12 sm:h-14 px-6 sm:px-8 bg-[#E55B5B] hover:bg-[#d64a4a] text-white font-extrabold rounded-2xl shadow-2xl shadow-[#E55B5B]/40 hover:scale-105 transition-all group"
               >
-                Lancer ma première recherche
+                {user ? 'Accéder à mon Dashboard' : 'Lancer ma première recherche'}
                 <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
@@ -556,7 +561,7 @@ export default function LandingPage() {
                 <p className="text-xs text-emerald-400 font-semibold mt-1">100 crédits (50 FCFA / lead)</p>
               </div>
 
-              <Link href="/login">
+              <Link href={user ? '/billing' : '/login'}>
                 <Button className="w-full h-12 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold">
                   Commencer
                 </Button>
@@ -577,7 +582,7 @@ export default function LandingPage() {
                 <p className="text-xs text-[#E55B5B] font-bold mt-1">500 crédits (40 FCFA / lead)</p>
               </div>
 
-              <Link href="/login">
+              <Link href={user ? '/billing' : '/login'}>
                 <Button className="w-full h-12 rounded-xl bg-[#E55B5B] hover:bg-[#d64a4a] text-white font-bold shadow-lg shadow-[#E55B5B]/30">
                   Choisir le Pack Pro
                 </Button>
@@ -595,7 +600,7 @@ export default function LandingPage() {
                 <p className="text-xs text-emerald-400 font-semibold mt-1">1 500 crédits (33 FCFA / lead)</p>
               </div>
 
-              <Link href="/login">
+              <Link href={user ? '/billing' : '/login'}>
                 <Button className="w-full h-12 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold">
                   Choisir Entreprise
                 </Button>
@@ -613,12 +618,12 @@ export default function LandingPage() {
             <p className="text-slate-300 max-w-xl text-base">
               Créez votre compte en 10 secondes et recevez <strong className="text-white">20 crédits gratuits</strong> pour extraire vos premiers prospects.
             </p>
-            <Link href="/login">
+            <Link href={targetHref}>
               <Button
                 size="lg"
                 className="h-14 px-8 text-lg font-extrabold bg-[#E55B5B] hover:bg-[#d64a4a] text-white rounded-2xl shadow-2xl shadow-[#E55B5B]/40 hover:scale-105 transition-all"
               >
-                Démarrer Gratuitement
+                {user ? 'Accéder à mon Cockpit' : 'Démarrer Gratuitement'}
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </Link>

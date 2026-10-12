@@ -8,7 +8,8 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { AFRICAN_COUNTRIES } from '@/lib/africa'
 import { createSearch } from '@/actions/searches'
-import { Search, Loader2, Sparkles, MapPin, Zap } from 'lucide-react'
+import Link from 'next/link'
+import { Search, Loader2, Sparkles, MapPin, Zap, AlertTriangle, ArrowRight, Coins } from 'lucide-react'
 
 const SUGGESTIONS = ['Dentiste', 'Pharmacie', 'Restaurant', 'Clinique', 'Boulangerie', 'Hôtel', 'Immobilier', 'École']
 
@@ -19,7 +20,7 @@ const VOLUME_OPTIONS = [
   { value: '200', leads: '200 leads', credits: '200 crédits' },
 ]
 
-export function SearchForm() {
+export function SearchForm({ userCredits = 0 }: { userCredits?: number }) {
   const [selectedCountryName, setSelectedCountryName] = useState('Sénégal')
   const [secteur, setSecteur] = useState('')
   const [selectedCity, setSelectedCity] = useState('Dakar')
@@ -239,24 +240,55 @@ export function SearchForm() {
             <input type="hidden" name="max_results" value={maxResults} />
           </div>
 
+          {/* Alerte Solde de Crédits */}
+          {userCredits < parseInt(maxResults, 10) && (
+            <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+              <div className="flex items-start sm:items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5 sm:mt-0" />
+                <span>
+                  Solde insuffisant : vous avez <strong>{userCredits} crédit{userCredits > 1 ? 's' : ''}</strong> sur <strong>{maxResults}</strong> requis.
+                </span>
+              </div>
+              <Link
+                href="/billing"
+                className="inline-flex items-center gap-1 font-bold text-[#f05a5a] hover:underline shrink-0 text-xs"
+              >
+                Recharger mes crédits
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          )}
+
           {/* Bouton de soumission */}
-          <Button
-            type="submit"
-            disabled={isPending || !secteur || (!selectedCity && !customCity)}
-            className="w-full bg-[#f05a5a] hover:bg-[#d64a4a] text-white font-extrabold h-12 rounded-xl button-glow transition-all mt-4 text-sm"
-          >
-            {isPending ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Initialisation de l'extraction...
-              </>
-            ) : (
-              <>
-                <Search className="w-4 h-4 mr-2" />
-                Lancer la recherche
-              </>
-            )}
-          </Button>
+          {userCredits < parseInt(maxResults, 10) ? (
+            <Link href="/billing" className="w-full">
+              <Button
+                type="button"
+                className="w-full bg-[#f05a5a] hover:bg-[#d64a4a] text-white font-extrabold h-12 rounded-xl button-glow transition-all mt-1 text-sm"
+              >
+                <Coins className="w-4 h-4 mr-2" />
+                Recharger mes crédits pour lancer la recherche
+              </Button>
+            </Link>
+          ) : (
+            <Button
+              type="submit"
+              disabled={isPending || !secteur || (!selectedCity && !customCity)}
+              className="w-full bg-[#f05a5a] hover:bg-[#d64a4a] text-white font-extrabold h-12 rounded-xl button-glow transition-all mt-1 text-sm"
+            >
+              {isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Initialisation de l'extraction...
+                </>
+              ) : (
+                <>
+                  <Search className="w-4 h-4 mr-2" />
+                  Lancer la recherche
+                </>
+              )}
+            </Button>
+          )}
 
           <p className="text-[11px] text-center text-slate-400">
             Dédoublonnage automatique & déduction au résultat effectif.
