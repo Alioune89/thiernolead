@@ -4,6 +4,9 @@ import { redirect } from 'next/navigation'
 import { connection } from 'next/server'
 import { SearchDetailView } from '@/components/searches/SearchDetailView'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export default async function SearchDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   await connection()
   const { id } = await params

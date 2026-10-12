@@ -142,8 +142,9 @@ export function SearchDetailView({
           if (res.ok) {
             const data = await res.json()
             if (data.search && data.search.statut !== 'running' && data.search.statut !== 'pending') {
+              if (interval) clearInterval(interval)
               setSearch((prev) => ({ ...prev, ...data.search }))
-              if (data.leads && data.leads.length > 0) {
+              if (data.leads && Array.isArray(data.leads) && data.leads.length > 0) {
                 setLeads(data.leads)
               }
               router.refresh()
