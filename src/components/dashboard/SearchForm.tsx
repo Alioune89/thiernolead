@@ -14,6 +14,7 @@ import { Search, Loader2, Sparkles, MapPin, Zap, AlertTriangle, ArrowRight, Coin
 const SUGGESTIONS = ['Dentiste', 'Pharmacie', 'Restaurant', 'Clinique', 'Boulangerie', 'Hôtel', 'Immobilier', 'École']
 
 const VOLUME_OPTIONS = [
+  { value: '10', leads: '10 leads', credits: '10 crédits' },
   { value: '20', leads: '20 leads', credits: '20 crédits' },
   { value: '50', leads: '50 leads', credits: '50 crédits', popular: true },
   { value: '100', leads: '100 leads', credits: '100 crédits' },
@@ -210,7 +211,7 @@ export function SearchForm({ userCredits = 0 }: { userCredits?: number }) {
               <span className="text-[11px] text-slate-400 font-medium">1 crédit par lead</span>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-0.5">
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-0.5">
               {VOLUME_OPTIONS.map((opt) => {
                 const isSelected = maxResults === opt.value
                 return (
