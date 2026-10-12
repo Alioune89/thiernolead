@@ -15,6 +15,14 @@ import {
   ShieldCheck,
   Building,
   TrendingUp,
+  Volume2,
+  Play,
+  Star,
+  Check,
+  MessageSquare,
+  Lock,
+  Download,
+  Mic,
 } from 'lucide-react'
 
 export default function LandingPage() {
@@ -128,143 +136,272 @@ export default function LandingPage() {
           </div>
 
           {/* MOCKUP INTERACTIF DU SAAS */}
-          <div className="mt-16 w-full max-w-5xl rounded-3xl p-3 bg-gradient-to-b from-white/15 to-white/5 border border-white/15 shadow-2xl backdrop-blur-2xl">
-            <div className="rounded-2xl bg-[#082115] border border-white/10 overflow-hidden text-left">
-              {/* Fake Browser Top Bar */}
-              <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-white/10 bg-white/[0.02]">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-rose-500/80" />
-                  <div className="w-3 h-3 rounded-full bg-amber-500/80" />
-                  <div className="w-3 h-3 rounded-full bg-emerald-500/80" />
-                  <span className="ml-2 sm:ml-3 text-[11px] sm:text-xs font-mono text-slate-400 truncate max-w-[150px] sm:max-w-none">
-                    laplead.com/dashboard
+          <div className="mt-14 w-full max-w-5xl rounded-3xl p-2 sm:p-3 bg-gradient-to-b from-white/15 to-white/5 border border-white/15 shadow-2xl backdrop-blur-2xl">
+            <div className="rounded-2xl bg-[#082115] border border-white/10 overflow-hidden text-left shadow-inner">
+              {/* Top Window Bar */}
+              <div className="flex items-center justify-between px-3.5 sm:px-6 py-3 border-b border-white/10 bg-white/[0.02]">
+                {/* macOS Window Controls */}
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <div className="w-2.5 h-2.5 rounded-full bg-rose-500/80" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
+                  <span className="hidden sm:inline-flex items-center gap-1.5 ml-3 px-3 py-1 rounded-full bg-white/[0.04] border border-white/5 text-[11px] font-mono text-slate-400">
+                    <Lock className="w-3 h-3 text-emerald-400" />
+                    https://app.laplead.com/dashboard
                   </span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-[11px] sm:text-xs px-2.5 py-0.5 sm:py-1 rounded-full bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/30 whitespace-nowrap">
-                    ● En Direct
+
+                {/* Live Scraping Pulse Indicator */}
+                <div className="flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 shrink-0">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                  </span>
+                  <span className="text-[11px] font-semibold text-emerald-400 whitespace-nowrap">
+                    Scraping en direct
                   </span>
                 </div>
               </div>
 
-              {/* Fake UI Content */}
-              <div className="p-4 sm:p-6 md:p-8 space-y-4 sm:space-y-6">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
-                  <div>
+              {/* Cockpit Content */}
+              <div className="p-3.5 sm:p-6 md:p-8 space-y-4 sm:space-y-6">
+                {/* Search Meta & Action Chips */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-white/5">
+                  <div className="space-y-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="text-lg sm:text-xl font-bold text-white">Dentistes à Dakar, Sénégal</h3>
-                      <Badge className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-mono text-xs">
-                        50 leads extraits
-                      </Badge>
+                      <h3 className="text-base sm:text-xl font-extrabold text-white">
+                        Dentistes à Dakar, Sénégal
+                      </h3>
+                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono text-[11px] font-bold">
+                        50 leads B2B
+                      </span>
                     </div>
-                    <p className="text-xs text-slate-400 mt-1">Extraction en temps réel • Coordonnées WhatsApp vérifiées</p>
+                    <p className="text-xs text-slate-400 flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-[#F05A5A] shrink-0" />
+                      Google Maps Scraping • Numéros WhatsApp qualifiés
+                    </p>
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-semibold px-3 py-1.5 rounded-xl bg-white/10 text-white border border-white/10">
-                      Export CSV
+                  <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
+                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-xl bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10 transition-colors">
+                      <Download className="w-3.5 h-3.5 text-slate-400" /> Export CSV
                     </span>
-                    <span className="text-xs font-semibold px-3 py-1.5 rounded-xl bg-[#E55B5B] text-white">
-                      Pitchs IA Prêts
+                    <span className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl bg-[#F05A5A] text-white shadow-lg shadow-[#F05A5A]/30">
+                      <Sparkles className="w-3.5 h-3.5" /> 50 Pitchs Prêts
                     </span>
                   </div>
                 </div>
 
-                {/* Table Simulation (Desktop) */}
-                <div className="hidden sm:block rounded-xl border border-white/10 overflow-hidden bg-white/[0.02]">
-                  <div className="grid grid-cols-12 px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-white/10">
-                    <div className="col-span-5">Établissement</div>
-                    <div className="col-span-4">Téléphone WhatsApp</div>
+                {/* DESKTOP VIEW: Data Table (screens >= 640px) */}
+                <div className="hidden sm:block rounded-2xl border border-white/10 overflow-hidden bg-white/[0.02]">
+                  <div className="grid grid-cols-12 px-5 py-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 border-b border-white/10 bg-white/[0.02]">
+                    <div className="col-span-5">Établissement & Ville</div>
+                    <div className="col-span-4">Coordonnées WhatsApp</div>
                     <div className="col-span-3 text-right">Action Directe</div>
                   </div>
 
                   <div className="divide-y divide-white/5 text-sm">
-                    <div className="grid grid-cols-12 px-4 py-3.5 items-center">
-                      <div className="col-span-5 font-bold text-white flex items-center gap-2">
-                        <Building className="w-4 h-4 text-[#F05A5A] shrink-0" />
-                        <span className="truncate">Cabinet Dentaire Teranga</span>
+                    {/* Row 1 */}
+                    <div className="grid grid-cols-12 px-5 py-3.5 items-center hover:bg-white/[0.03] transition-colors">
+                      <div className="col-span-5 flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-xl bg-[#F05A5A]/15 border border-[#F05A5A]/25 text-[#F05A5A] flex items-center justify-center font-bold text-xs shrink-0">
+                          CT
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-bold text-white text-sm truncate">Cabinet Dentaire Teranga</p>
+                          <p className="text-xs text-slate-400 flex items-center gap-1">
+                            <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+                            <span>4.8 (42 avis)</span>
+                            <span>• Dakar Plateau</span>
+                          </p>
+                        </div>
                       </div>
-                      <div className="col-span-4 font-mono text-xs text-emerald-400 font-semibold whitespace-nowrap">
-                        +221 77 654 32 10
+
+                      <div className="col-span-4">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-mono text-xs font-semibold">
+                          <Phone className="w-3 h-3" />
+                          +221 77 654 32 10
+                        </span>
                       </div>
+
                       <div className="col-span-3 text-right">
-                        <span className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                          <Send className="w-3 h-3" /> WhatsApp
+                        <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#25D366]/20 hover:bg-[#25D366]/30 text-[#25D366] border border-[#25D366]/40 font-bold text-xs shadow-sm transition-all cursor-pointer">
+                          <MessageSquare className="w-3.5 h-3.5" />
+                          Contacter
                         </span>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-12 px-4 py-3.5 items-center">
-                      <div className="col-span-5 font-bold text-white flex items-center gap-2">
-                        <Building className="w-4 h-4 text-[#F05A5A] shrink-0" />
-                        <span className="truncate">Clinique Almadies Santé</span>
+                    {/* Row 2 */}
+                    <div className="grid grid-cols-12 px-5 py-3.5 items-center hover:bg-white/[0.03] transition-colors">
+                      <div className="col-span-5 flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-xl bg-[#F05A5A]/15 border border-[#F05A5A]/25 text-[#F05A5A] flex items-center justify-center font-bold text-xs shrink-0">
+                          CA
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-bold text-white text-sm truncate">Clinique Almadies Santé</p>
+                          <p className="text-xs text-slate-400 flex items-center gap-1">
+                            <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+                            <span>4.9 (88 avis)</span>
+                            <span>• Les Almadies</span>
+                          </p>
+                        </div>
                       </div>
-                      <div className="col-span-4 font-mono text-xs text-emerald-400 font-semibold whitespace-nowrap">
-                        +221 78 123 45 67
+
+                      <div className="col-span-4">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-mono text-xs font-semibold">
+                          <Phone className="w-3 h-3" />
+                          +221 78 123 45 67
+                        </span>
                       </div>
+
                       <div className="col-span-3 text-right">
-                        <span className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                          <Send className="w-3 h-3" /> WhatsApp
+                        <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#25D366]/20 hover:bg-[#25D366]/30 text-[#25D366] border border-[#25D366]/40 font-bold text-xs shadow-sm transition-all cursor-pointer">
+                          <MessageSquare className="w-3.5 h-3.5" />
+                          Contacter
                         </span>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Mobile Responsive Cards (Screens < 640px) */}
-                <div className="sm:hidden space-y-2.5">
-                  <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 space-y-2">
-                    <div className="font-bold text-white text-sm flex items-center gap-2">
-                      <Building className="w-4 h-4 text-[#F05A5A] shrink-0" />
-                      <span className="truncate">Cabinet Dentaire Teranga</span>
-                    </div>
-                    <div className="flex items-center justify-between gap-2 pt-1.5 border-t border-white/5">
-                      <div className="font-mono text-xs text-emerald-400 font-semibold">
-                        +221 77 654 32 10
+                {/* MOBILE VIEW: Dedicated Responsive Lead Cards (screens < 640px) */}
+                <div className="sm:hidden space-y-3">
+                  {/* Lead 1 Mobile Card */}
+                  <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3.5 space-y-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-[#F05A5A]/15 border border-[#F05A5A]/25 text-[#F05A5A] flex items-center justify-center font-bold text-sm shrink-0">
+                        CT
                       </div>
-                      <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shrink-0">
-                        <Send className="w-3 h-3" /> WhatsApp
+                      <div className="min-w-0 flex-1">
+                        <p className="font-bold text-white text-sm truncate">
+                          Cabinet Dentaire Teranga
+                        </p>
+                        <div className="flex items-center gap-2 text-[11px] text-slate-400 mt-0.5">
+                          <span className="flex items-center gap-0.5 text-amber-400 font-semibold">
+                            <Star className="w-3 h-3 fill-amber-400" /> 4.8
+                          </span>
+                          <span>•</span>
+                          <span className="truncate">Dakar Plateau</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between gap-2 pt-2.5 border-t border-white/5">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-mono text-xs font-semibold whitespace-nowrap">
+                        <Phone className="w-3 h-3 shrink-0" />
+                        +221 77 654 32 10
+                      </span>
+
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#25D366] text-black font-bold text-xs shadow-md shadow-[#25D366]/20 shrink-0">
+                        <MessageSquare className="w-3.5 h-3.5" />
+                        WhatsApp
                       </span>
                     </div>
                   </div>
 
-                  <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 space-y-2">
-                    <div className="font-bold text-white text-sm flex items-center gap-2">
-                      <Building className="w-4 h-4 text-[#F05A5A] shrink-0" />
-                      <span className="truncate">Clinique Almadies Santé</span>
-                    </div>
-                    <div className="flex items-center justify-between gap-2 pt-1.5 border-t border-white/5">
-                      <div className="font-mono text-xs text-emerald-400 font-semibold">
-                        +221 78 123 45 67
+                  {/* Lead 2 Mobile Card */}
+                  <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3.5 space-y-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-[#F05A5A]/15 border border-[#F05A5A]/25 text-[#F05A5A] flex items-center justify-center font-bold text-sm shrink-0">
+                        CA
                       </div>
-                      <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shrink-0">
-                        <Send className="w-3 h-3" /> WhatsApp
+                      <div className="min-w-0 flex-1">
+                        <p className="font-bold text-white text-sm truncate">
+                          Clinique Almadies Santé
+                        </p>
+                        <div className="flex items-center gap-2 text-[11px] text-slate-400 mt-0.5">
+                          <span className="flex items-center gap-0.5 text-amber-400 font-semibold">
+                            <Star className="w-3 h-3 fill-amber-400" /> 4.9
+                          </span>
+                          <span>•</span>
+                          <span className="truncate">Les Almadies</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between gap-2 pt-2.5 border-t border-white/5">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-mono text-xs font-semibold whitespace-nowrap">
+                        <Phone className="w-3 h-3 shrink-0" />
+                        +221 78 123 45 67
+                      </span>
+
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#25D366] text-black font-bold text-xs shadow-md shadow-[#25D366]/20 shrink-0">
+                        <MessageSquare className="w-3.5 h-3.5" />
+                        WhatsApp
                       </span>
                     </div>
                   </div>
                 </div>
 
-                {/* Gemini Copywriting Preview Box */}
-                <div className="rounded-2xl p-3.5 sm:p-4 bg-white/5 border border-emerald-500/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 sm:gap-4">
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 rounded-xl bg-purple-500/20 text-purple-300 shrink-0">
-                      <Sparkles className="w-5 h-5" />
-                    </div>
-                    <div className="space-y-1">
-                      <div className="flex flex-wrap items-center gap-1.5">
-                        <p className="text-xs font-bold text-white">Copywriting IA Bilingue (Gemini Flash)</p>
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 font-mono font-semibold">
-                          Francais & Wolof
-                        </span>
+                {/* Gemini Copywriting & Wave Studio Interactive Preview */}
+                <div className="rounded-2xl p-4 sm:p-5 bg-gradient-to-r from-purple-950/40 to-emerald-950/30 border border-purple-500/25 space-y-3.5">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                    <div className="flex items-center gap-2.5">
+                      <div className="p-2 rounded-xl bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                        <Sparkles className="w-4 h-4" />
                       </div>
-                      <p className="text-xs text-slate-300 leading-relaxed">
-                        « Nanga def Dr. Cabinet Teranga, c'est Alioune de Teranga Digital... »
-                      </p>
+                      <div>
+                        <p className="text-xs font-extrabold text-white flex items-center gap-1.5">
+                          Copywriting IA Gemini Flash
+                        </p>
+                        <p className="text-[11px] text-slate-400">
+                          Pitch personnalisé avec prénom, quartier & activité
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Language Switcher Pill */}
+                    <div className="flex items-center gap-1 p-1 rounded-xl bg-black/40 border border-white/10 self-start sm:self-auto">
+                      <span className="px-2.5 py-0.5 rounded-lg bg-purple-500 text-white text-[10px] font-bold">
+                        🇸🇳 Wolof
+                      </span>
+                      <span className="px-2.5 py-0.5 rounded-lg text-slate-400 text-[10px] font-semibold">
+                        🇫🇷 Français
+                      </span>
                     </div>
                   </div>
-                  <span className="text-xs font-bold px-3 py-1.5 rounded-xl bg-white/10 text-white shrink-0 self-start md:self-auto">
-                    Ouvrir wa.me en 1 Clic 🚀
-                  </span>
+
+                  {/* Speech Message Preview */}
+                  <div className="p-3 rounded-xl bg-black/30 border border-white/5 text-xs text-slate-200 leading-relaxed font-sans">
+                    « Nanga def Dr. Teranga, c'est Alioune de Teranga Digital. Nous remarquons votre forte réputation aux Almadies et souhaitons vous apporter +20 nouveaux patients ce mois-ci via WhatsApp... »
+                  </div>
+
+                  {/* Wave Voice Note Studio Preview */}
+                  <div className="p-2.5 sm:p-3 rounded-xl bg-white/[0.03] border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-[#25D366] text-black flex items-center justify-center shrink-0 shadow-md">
+                        <Play className="w-3.5 h-3.5 fill-black ml-0.5" />
+                      </div>
+
+                      {/* Equalizer Waveform */}
+                      <div className="flex items-center gap-1">
+                        <span className="w-1 h-3 bg-emerald-400 rounded-full animate-pulse" />
+                        <span className="w-1 h-5 bg-emerald-400 rounded-full" />
+                        <span className="w-1 h-2 bg-emerald-400 rounded-full" />
+                        <span className="w-1 h-6 bg-[#25D366] rounded-full animate-pulse" />
+                        <span className="w-1 h-4 bg-emerald-400 rounded-full" />
+                        <span className="w-1 h-7 bg-[#25D366] rounded-full" />
+                        <span className="w-1 h-3 bg-emerald-400 rounded-full" />
+                        <span className="w-1 h-5 bg-[#25D366] rounded-full" />
+                        <span className="w-1 h-2 bg-emerald-400 rounded-full" />
+                        <span className="w-1 h-4 bg-emerald-400 rounded-full" />
+                      </div>
+
+                      <span className="text-xs font-mono text-emerald-400 font-semibold">
+                        0:18 <span className="text-slate-500 font-normal">/ 0:35</span>
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto">
+                      <span className="text-[11px] text-slate-400 font-medium">
+                        🎤 Note vocale Wave prête
+                      </span>
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#F05A5A] hover:bg-[#F05A5A]/90 text-white font-bold text-xs shadow-lg shadow-[#F05A5A]/25 shrink-0 cursor-pointer">
+                        Envoyer en 1 Clic 🚀
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
