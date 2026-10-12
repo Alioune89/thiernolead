@@ -27,15 +27,15 @@ import {
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-[#082115] text-white flex flex-col selection:bg-[#E55B5B] selection:text-white">
+    <div className="min-h-screen bg-[#082115] text-white flex flex-col selection:bg-[#E55B5B] selection:text-white w-full max-w-[100vw] overflow-x-hidden">
       {/* Navbar Flottante */}
-      <header className="sticky top-0 z-50 w-full backdrop-blur-xl bg-[#082115]/80 border-b border-white/10 transition-all">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#E55B5B] to-[#F05A5A] flex items-center justify-center font-black text-xl text-white shadow-lg shadow-[#E55B5B]/30 group-hover:scale-105 transition-transform">
+      <header className="sticky top-0 z-50 w-full max-w-[100vw] backdrop-blur-xl bg-[#082115]/95 border-b border-white/10 transition-all overflow-hidden">
+        <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-1.5 sm:gap-2 group shrink-0">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-[#E55B5B] to-[#F05A5A] flex items-center justify-center font-black text-base sm:text-xl text-white shadow-lg shadow-[#E55B5B]/30 group-hover:scale-105 transition-transform">
               L
             </div>
-            <span className="font-extrabold text-2xl tracking-tight text-white">
+            <span className="font-extrabold text-lg sm:text-2xl tracking-tight text-white">
               Lap<span className="text-[#F05A5A]">lead</span>
             </span>
           </Link>
@@ -55,83 +55,83 @@ export default function LandingPage() {
             </a>
           </nav>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1.5 sm:gap-4 shrink-0">
             <Link
               href="/login"
-              className="text-sm font-semibold text-slate-300 hover:text-white transition-colors px-3 py-2"
+              className="text-xs sm:text-sm font-semibold text-slate-300 hover:text-white transition-colors px-2 sm:px-3 py-1.5 sm:py-2 whitespace-nowrap"
             >
-              Se connecter
+              Connexion
             </Link>
             <Link href="/login">
-              <Button className="bg-[#E55B5B] hover:bg-[#d64a4a] text-white font-bold px-5 h-11 rounded-xl shadow-lg shadow-[#E55B5B]/25 hover:scale-105 transition-all">
-                Essai Gratuit
-                <ArrowRight className="w-4 h-4 ml-1.5" />
+              <Button className="bg-[#E55B5B] hover:bg-[#d64a4a] text-white font-bold text-xs sm:text-sm px-2.5 sm:px-5 h-8 sm:h-11 rounded-xl shadow-lg shadow-[#E55B5B]/25 hover:scale-105 transition-all whitespace-nowrap">
+                <span>Essai Gratuit</span>
+                <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-1.5" />
               </Button>
             </Link>
           </div>
         </div>
       </header>
 
-      <main className="flex-1 flex flex-col items-center">
+      <main className="flex-1 flex flex-col items-center w-full max-w-[100vw] overflow-x-hidden">
         {/* HERO SECTION */}
-        <section className="relative w-full max-w-7xl px-4 sm:px-6 lg:px-8 pt-16 pb-24 flex flex-col items-center text-center overflow-hidden">
+        <section className="relative w-full max-w-7xl px-3 sm:px-6 lg:px-8 pt-10 sm:pt-16 pb-16 sm:pb-24 flex flex-col items-center text-center overflow-hidden">
           {/* Ambient Glows */}
-          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-emerald-500/10 rounded-full blur-[120px] pointer-events-none" />
-          <div className="absolute top-10 right-10 w-80 h-80 bg-[#E55B5B]/15 rounded-full blur-[100px] pointer-events-none" />
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[600px] h-[300px] sm:h-[400px] bg-emerald-500/10 rounded-full blur-[100px] pointer-events-none" />
+          <div className="absolute top-10 right-0 sm:right-10 w-48 sm:w-80 h-48 sm:h-80 bg-[#E55B5B]/15 rounded-full blur-[80px] pointer-events-none" />
 
           {/* Badge Pill */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs md:text-sm font-bold bg-white/5 border border-white/10 backdrop-blur-md mb-8 hover:border-[#E55B5B]/40 transition-all">
-            <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-slate-200">Le 1er Moteur B2B & Prospection IA en Afrique</span>
-            <span className="text-xs px-2 py-0.5 rounded-full bg-[#E55B5B]/20 text-[#F05A5A] font-extrabold ml-1">
+          <div className="inline-flex max-w-[95vw] items-center gap-1.5 px-3 py-1 rounded-full text-[11px] sm:text-xs md:text-sm font-bold bg-white/5 border border-white/10 backdrop-blur-md mb-6 sm:mb-8 hover:border-[#E55B5B]/40 transition-all">
+            <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+            <span className="text-slate-200 truncate">1er Moteur B2B & Prospection IA en Afrique</span>
+            <span className="text-[10px] sm:text-xs px-2 py-0.5 rounded-full bg-[#E55B5B]/20 text-[#F05A5A] font-extrabold ml-1 shrink-0">
               54 PAYS
             </span>
           </div>
 
           {/* Headline */}
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white max-w-5xl leading-[1.1] text-balance">
+          <h1 className="text-2xl sm:text-4xl md:text-6xl lg:text-7xl font-black tracking-tight text-white max-w-5xl leading-[1.2] px-2 text-balance break-words">
             Trouvez vos futurs clients africains en <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F05A5A] via-[#FF8A8A] to-[#F05A5A]">60 secondes chrono</span>.
           </h1>
 
           {/* Sous-titre */}
-          <p className="mt-6 text-lg sm:text-xl text-slate-300 max-w-3xl leading-relaxed text-balance">
+          <p className="mt-4 sm:mt-6 text-sm sm:text-lg md:text-xl text-slate-300 max-w-3xl leading-relaxed px-2 text-balance">
             Extrayez les coordonnées complètes des entreprises locales depuis Google Maps et contactez-les directement sur <strong className="text-white">WhatsApp</strong> avec des messages personnalisés rédigés par l'IA en <strong className="text-white">Français</strong> et en <strong className="text-white">Wolof</strong>.
           </p>
 
           {/* CTA & Trust */}
-          <div className="mt-10 flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+          <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full px-2 sm:px-0 sm:w-auto">
             <Link href="/login" className="w-full sm:w-auto">
               <Button
                 size="lg"
-                className="w-full sm:w-auto text-base sm:text-lg h-14 px-8 bg-[#E55B5B] hover:bg-[#d64a4a] text-white font-extrabold rounded-2xl shadow-2xl shadow-[#E55B5B]/40 hover:scale-105 transition-all group"
+                className="w-full sm:w-auto text-sm sm:text-lg h-12 sm:h-14 px-6 sm:px-8 bg-[#E55B5B] hover:bg-[#d64a4a] text-white font-extrabold rounded-2xl shadow-2xl shadow-[#E55B5B]/40 hover:scale-105 transition-all group"
               >
                 Lancer ma première recherche
-                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
-            <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-300 bg-white/5 border border-white/10 px-4 py-3.5 rounded-2xl">
-              <Coins className="w-4 h-4 text-[#F05A5A]" />
-              <span><strong>20 crédits offerts</strong> à l'inscription • Sans carte bancaire</span>
+            <div className="flex items-center justify-center text-center gap-2 text-[11px] sm:text-sm text-slate-300 bg-white/5 border border-white/10 px-3.5 py-2.5 sm:py-3.5 rounded-2xl max-w-full">
+              <Coins className="w-4 h-4 text-[#F05A5A] shrink-0" />
+              <span><strong>20 crédits offerts</strong> • Sans carte bancaire</span>
             </div>
           </div>
 
           {/* Stat Tickers */}
-          <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-4xl pt-8 border-t border-white/10 text-center">
-            <div className="p-4 rounded-2xl bg-white/[0.02]">
-              <p className="text-3xl font-black text-white font-mono">54</p>
-              <p className="text-xs text-slate-400 font-semibold mt-1">Pays d'Afrique couverts</p>
+          <div className="mt-12 sm:mt-16 grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4 w-full max-w-4xl px-2 sm:px-0 pt-6 sm:pt-8 border-t border-white/10 text-center">
+            <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white/[0.02]">
+              <p className="text-2xl sm:text-3xl font-black text-white font-mono">54</p>
+              <p className="text-[11px] sm:text-xs text-slate-400 font-semibold mt-1">Pays d'Afrique couverts</p>
             </div>
-            <div className="p-4 rounded-2xl bg-white/[0.02]">
-              <p className="text-3xl font-black text-[#F05A5A] font-mono">+120k</p>
-              <p className="text-xs text-slate-400 font-semibold mt-1">Entreprises indexées</p>
+            <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white/[0.02]">
+              <p className="text-2xl sm:text-3xl font-black text-[#F05A5A] font-mono">+120k</p>
+              <p className="text-[11px] sm:text-xs text-slate-400 font-semibold mt-1">Entreprises indexées</p>
             </div>
-            <div className="p-4 rounded-2xl bg-white/[0.02]">
-              <p className="text-3xl font-black text-emerald-400 font-mono">1-Clic</p>
-              <p className="text-xs text-slate-400 font-semibold mt-1">Lancement WhatsApp Direct</p>
+            <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white/[0.02]">
+              <p className="text-2xl sm:text-3xl font-black text-emerald-400 font-mono">1-Clic</p>
+              <p className="text-[11px] sm:text-xs text-slate-400 font-semibold mt-1">Lancement WhatsApp Direct</p>
             </div>
-            <div className="p-4 rounded-2xl bg-white/[0.02]">
-              <p className="text-3xl font-black text-white font-mono">FR / WO</p>
-              <p className="text-xs text-slate-400 font-semibold mt-1">Copywriting IA Bilingue</p>
+            <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white/[0.02]">
+              <p className="text-2xl sm:text-3xl font-black text-white font-mono">FR / WO</p>
+              <p className="text-[11px] sm:text-xs text-slate-400 font-semibold mt-1">Copywriting IA Bilingue</p>
             </div>
           </div>
 

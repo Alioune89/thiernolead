@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { connection } from 'next/server'
 import { Button } from '@/components/ui/button'
+import { SignOutButton } from '@/components/auth/SignOutButton'
 import { Search, Settings, Coins, LogOut, Plus, Sparkles, Building2 } from 'lucide-react'
 
 export default async function AppLayout({
@@ -92,16 +93,7 @@ export default async function AppLayout({
             </Link>
 
             {/* Sign Out Button */}
-            <form action="/auth/signout" method="post">
-              <Button
-                variant="ghost"
-                size="icon"
-                title="Se déconnecter"
-                className="text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-xl h-8 w-8 sm:h-9 sm:w-9"
-              >
-                <LogOut className="h-4 w-4" />
-              </Button>
-            </form>
+            <SignOutButton />
           </div>
         </div>
 
