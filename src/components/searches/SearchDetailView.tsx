@@ -147,7 +147,8 @@ export function SearchDetailView({
               if (data.leads && Array.isArray(data.leads) && data.leads.length > 0) {
                 setLeads(data.leads)
               }
-              router.refresh()
+              // Rechargement immédiat et sans cache pour afficher les résultats sur mobile et desktop
+              window.location.reload()
             }
           }
         } catch (err) {
