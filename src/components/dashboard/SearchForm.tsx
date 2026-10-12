@@ -12,12 +12,20 @@ import { Search, Loader2, Sparkles, MapPin, Zap } from 'lucide-react'
 
 const SUGGESTIONS = ['Dentiste', 'Pharmacie', 'Restaurant', 'Clinique', 'Boulangerie', 'Hôtel', 'Immobilier', 'École']
 
+const VOLUME_OPTIONS = [
+  { value: '20', leads: '20 leads', credits: '20 crédits' },
+  { value: '50', leads: '50 leads', credits: '50 crédits', popular: true },
+  { value: '100', leads: '100 leads', credits: '100 crédits' },
+  { value: '200', leads: '200 leads', credits: '200 crédits' },
+]
+
 export function SearchForm() {
   const [selectedCountryName, setSelectedCountryName] = useState('Sénégal')
   const [secteur, setSecteur] = useState('')
   const [selectedCity, setSelectedCity] = useState('Dakar')
   const [customCity, setCustomCity] = useState('')
   const [isCustomCity, setIsCustomCity] = useState(false)
+  const [maxResults, setMaxResults] = useState('20')
   const [isPending, startTransition] = useTransition()
 
   const currentCountry = AFRICAN_COUNTRIES.find((c) => c.name === selectedCountryName) || AFRICAN_COUNTRIES[0]
@@ -49,6 +57,7 @@ export function SearchForm() {
     formData.set('ville', finalCity)
     formData.set('pays', selectedCountryName)
     formData.set('secteur', secteur)
+    formData.set('max_results', maxResults)
 
     startTransition(async () => {
       await createSearch(formData)
@@ -191,25 +200,43 @@ export function SearchForm() {
             )}
           </div>
 
-          {/* Résultats Max */}
-          <div className="space-y-1.5 text-left">
+          {/* Volume de leads */}
+          <div className="space-y-2 text-left">
             <div className="flex items-center justify-between">
               <Label htmlFor="max_results" className="text-xs font-bold text-slate-700 uppercase tracking-wider">
                 Volume de leads
               </Label>
               <span className="text-[11px] text-slate-400 font-medium">1 crédit par lead</span>
             </div>
-            <Select name="max_results" defaultValue="20">
-              <SelectTrigger className="bg-white text-slate-900 border-slate-200 focus:ring-[#f05a5a] h-11 rounded-xl text-sm font-semibold shadow-xs">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-white text-slate-900 rounded-xl shadow-2xl border-slate-200">
-                <SelectItem value="20" className="py-2">20 leads (20 crédits)</SelectItem>
-                <SelectItem value="50" className="py-2">50 leads (50 crédits)</SelectItem>
-                <SelectItem value="100" className="py-2">100 leads (100 crédits)</SelectItem>
-                <SelectItem value="200" className="py-2">200 leads (200 crédits)</SelectItem>
-              </SelectContent>
-            </Select>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-0.5">
+              {VOLUME_OPTIONS.map((opt) => {
+                const isSelected = maxResults === opt.value
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setMaxResults(opt.value)}
+                    className={`relative flex flex-col items-center justify-center py-2.5 px-2 rounded-xl border text-center transition-all cursor-pointer ${
+                      isSelected
+                        ? 'bg-red-50/80 border-[#f05a5a] text-[#f05a5a] shadow-xs ring-2 ring-[#f05a5a]/20 font-bold'
+                        : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50 font-medium'
+                    }`}
+                  >
+                    {opt.popular && (
+                      <span className="absolute -top-2 right-2 text-[9px] font-black uppercase tracking-wider bg-[#f05a5a] text-white px-1.5 py-0.2 rounded-full shadow-xs">
+                        Populaire
+                      </span>
+                    )}
+                    <span className="text-xs sm:text-sm font-extrabold">{opt.leads}</span>
+                    <span className={`text-[10px] sm:text-[11px] mt-0.5 ${isSelected ? 'text-[#f05a5a] font-semibold' : 'text-slate-400'}`}>
+                      {opt.credits}
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+            <input type="hidden" name="max_results" value={maxResults} />
           </div>
 
           {/* Bouton de soumission */}
