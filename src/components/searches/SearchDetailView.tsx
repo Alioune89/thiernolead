@@ -108,7 +108,20 @@ export function SearchDetailView({
   const router = useRouter()
   const isRunning = search.statut === 'pending' || search.statut === 'running'
 
-  // Timer & Real-time Polling
+  // Synchronisation des props serveur avec le state React
+  useEffect(() => {
+    if (initialLeads && initialLeads.length > 0) {
+      setLeads(initialLeads)
+    }
+  }, [initialLeads])
+
+  useEffect(() => {
+    if (initialSearch) {
+      setSearch(initialSearch)
+    }
+  }, [initialSearch])
+
+  // Timer & Real-time Polling ultra-réactif (1.5s avec anti-cache pour mobile)
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null
 
@@ -118,24 +131,34 @@ export function SearchDetailView({
         setElapsedSeconds(Math.floor((Date.now() - startTime) / 1000))
 
         try {
-          const res = await fetch(`/api/searches/${search.id}/status`)
+          const res = await fetch(`/api/searches/${search.id}/status?_t=${Date.now()}`, {
+            cache: 'no-store',
+            headers: {
+              'Cache-Control': 'no-cache, no-store, must-revalidate',
+              'Pragma': 'no-cache',
+            },
+          })
+
           if (res.ok) {
             const data = await res.json()
-            if (data.search && data.search.statut !== search.statut) {
+            if (data.search && data.search.statut !== 'running' && data.search.statut !== 'pending') {
               setSearch((prev) => ({ ...prev, ...data.search }))
+              if (data.leads && data.leads.length > 0) {
+                setLeads(data.leads)
+              }
               router.refresh()
             }
           }
         } catch (err) {
           console.error('Erreur polling:', err)
         }
-      }, 2500)
+      }, 1500)
     }
 
     return () => {
       if (interval) clearInterval(interval)
     }
-  }, [isRunning, search.id, search.statut, router])
+  }, [isRunning, search.id, router])
 
   // Nettoyage de l'enregistrement audio
   const cleanupAudio = () => {

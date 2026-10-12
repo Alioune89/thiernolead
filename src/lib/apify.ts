@@ -30,6 +30,13 @@ export async function runGoogleMapsScraperSync({
     language: 'fr',
     skipClosedPlaces: true,
     scrapeContacts: withEmails,
+    maxReviews: 0,
+    maxImages: 0,
+    scrapeReviewerName: false,
+    scrapeReviewerId: false,
+    scrapeReviewUrl: false,
+    scrapeResponseFromOwnerText: false,
+    oneQueryAtTime: true,
   }, {
     waitSecs: 3600,
     maxTotalChargeUsd: safetyMargin,

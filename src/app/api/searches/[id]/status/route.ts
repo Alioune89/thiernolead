@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -27,5 +30,24 @@ export async function GET(
     return NextResponse.json({ error: 'Recherche introuvable' }, { status: 404 })
   }
 
-  return NextResponse.json({ search })
+  let leads = []
+  if (search.statut === 'succeeded') {
+    const { data: leadsData } = await adminSupabase
+      .from('leads')
+      .select('*')
+      .eq('search_id', search.id)
+      .order('note', { ascending: false })
+    leads = leadsData || []
+  }
+
+  return NextResponse.json(
+    { search, leads },
+    {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+        Pragma: 'no-cache',
+        Expires: '0',
+      },
+    }
+  )
 }
