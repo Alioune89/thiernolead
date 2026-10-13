@@ -4,23 +4,25 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { runGoogleMapsScraperSync } from '@/lib/apify'
 import { normalizeLeads } from '@/lib/normalize'
+import { CREDITS_PER_SEARCH, SEARCH_VOLUMES } from '@/lib/pricing'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 
 export async function createSearch(formData: FormData) {
   const supabase = await createClient()
-  
+
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Non autorisé')
 
   const secteur = formData.get('secteur') as string
   const pays = formData.get('pays') as string
   const ville = formData.get('ville') as string
-  const maxResults = parseInt(formData.get('max_results') as string, 10)
-  const withEmails = false 
+  const requestedResults = parseInt(formData.get('max_results') as string, 10)
+  const maxResults = (SEARCH_VOLUMES as readonly number[]).includes(requestedResults) ? requestedResults : SEARCH_VOLUMES[1]
+  const withEmails = false
 
-  const costPerLead = withEmails ? 2 : 1
-  const totalCost = maxResults * costPerLead
+  // Coût fixe par génération de leads, quel que soit le volume demandé.
+  const totalCost = CREDITS_PER_SEARCH
   const adminSupabase = createAdminClient()
 
   // 1. Déduire les crédits
@@ -77,9 +79,10 @@ export async function createSearch(formData: FormData) {
         await adminSupabase.from('leads').upsert(formattedLeads, { onConflict: 'search_id,place_id', ignoreDuplicates: true })
       }
 
+      // Garantie zéro perte : une recherche sans aucun lead est intégralement remboursée.
       const leadsCount = formattedLeads.length
-      const creditsUsed = leadsCount * costPerLead
-      const creditsRefund = Math.max(0, search.credits_reserved - creditsUsed)
+      const creditsUsed = leadsCount > 0 ? search.credits_reserved : 0
+      const creditsRefund = search.credits_reserved - creditsUsed
 
       if (creditsRefund > 0) {
         await adminSupabase.rpc('add_credits', {
@@ -93,7 +96,7 @@ export async function createSearch(formData: FormData) {
         .from('searches')
         .update({ statut: 'succeeded', results_count: leadsCount, credits_billed: creditsUsed, apify_run_id: runId })
         .eq('id', search.id)
-        
+
     } catch (error) {
       console.error("Erreur Apify Background:", error)
       await adminSupabase.rpc('add_credits', { user_id_param: search.user_id, amount: totalCost, motif_param: 'erreur' })

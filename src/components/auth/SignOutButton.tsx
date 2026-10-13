@@ -17,7 +17,7 @@ export function SignOutButton() {
       await supabase.auth.signOut()
 
       // 2. Appel serveur pour invalider les cookies de session SSR
-      await fetch('/auth/signout', { method: 'POST' }).catch(() => {})
+      await fetch('/auth/signout', { method: 'POST' }).catch(() => { })
 
       // 3. Redirection complète et nettoyage du cache navigateur
       window.location.href = '/login'

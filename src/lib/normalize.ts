@@ -20,7 +20,7 @@ export function normalizeLeads(items: any[], searchId: string, userId: string) {
           // Vérification basique du type (libphonenumber-js max permet de vérifier le type exact, on utilise une version basique)
           const type = phoneNumber.getType()
           isMobile = type === 'MOBILE' || type === 'FIXED_LINE_OR_MOBILE'
-          
+
           if (isMobile) {
             lienWhatsapp = `https://wa.me/${telephoneE164.replace('+', '')}`
           }

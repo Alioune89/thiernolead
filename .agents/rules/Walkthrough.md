@@ -11,7 +11,7 @@
 * **Nom du Produit :** Laplead (Répertoire du projet : `thiernilead`)
 * **Mission :** Le 1er Moteur B2B de génération de leads et de prospection intelligente par IA (Texte & Note Vocale) conçu pour le continent africain (54 pays).
 * **Cible :** Agences web/marketing, commerciaux B2B, entrepreneurs et prestataires de services qui ciblent les entreprises locales (pharmacies, restaurants, cliniques, commerces, etc.) en Afrique.
-* **Modèle Économique :** Système de crédits sans abonnement contraignant. 1 crédit = 1 prospect complet qualifié (téléphone, adresse, avis, site web, et pitch de contact IA). Recharges par Mobile Money (Wave, Orange Money, MTN MoMo, Free Money, Moov Money) et Cartes Bancaires.
+* **Modèle Économique :** Système de crédits sans abonnement contraignant. 5 crédits offerts à l'inscription (et une fois à chaque compte existant). Chaque génération de leads (recherche) coûte 3 crédits, quel que soit le volume. Recharges via **Moneroo** (Wave, Orange Money, MTN MoMo, Free Money, Moov Money, cartes). Règles centralisées dans `src/lib/pricing.ts`.
 
 ---
 
@@ -38,7 +38,7 @@
 
 ### Authentification & Shell Applicatif
 * `src/app/page.tsx` : Landing Page vitrine haute conversion (Mockup interactif, 54 pays africains, 3 étapes, tarifs, social proof).
-* `src/app/(auth)/login/page.tsx` : Page de connexion et création de compte instantanée avec 20 crédits offerts.
+* `src/app/(auth)/login/page.tsx` : Page de connexion et création de compte instantanée avec 5 crédits offerts.
 * `src/app/(app)/layout.tsx` : Layout sécurisé avec en-tête en verre dépoli, pilule de crédits avec lien de recharge rapide, avatar utilisateur et barre de navigation mobile responsive.
 
 ### Dashboard & Recherches
@@ -78,7 +78,8 @@
 
 ### Facturation & Paramètres
 * `src/app/(app)/billing/page.tsx` :
-  * Packs de crédits : Pack Découverte (100 crédits / 5 000 FCFA), Pack Croissance Pro (500 crédits / 20 000 FCFA), Pack Entreprise (1 500 crédits / 50 000 FCFA).
+  * Packs de crédits (`CREDIT_PACKS`) : Pack Découverte (100 crédits / 5 000 FCFA), Pack Croissance Pro (500 crédits / 20 000 FCFA), Pack Entreprise (1 500 crédits / 50 000 FCFA).
+  * Bouton « Payer avec Moneroo » → action `buyCredits` → page hébergée Moneroo → retour sur `/billing/retour` (statut re-vérifié auprès de l'API Moneroo) + webhook `/api/webhooks/moneroo` (signature HMAC). Crédit idempotent via la RPC `complete_payment`.
   * Badges des moyens de paiement africains : Wave, Orange Money, MTN MoMo, Free Money, Moov Money, Cartes Bancaires.
   * Historique détaillé des transactions de crédits.
 * `src/app/(app)/settings/page.tsx` :

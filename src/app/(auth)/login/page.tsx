@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'sonner'
+import { WELCOME_CREDITS } from '@/lib/pricing'
 import { Mail, Lock, ArrowRight, Coins, CheckCircle2, AlertCircle } from 'lucide-react'
 
 export default function LoginPage() {
@@ -71,7 +72,7 @@ export default function LoginPage() {
         return
       }
 
-      toast.success('Compte créé avec succès ! 20 crédits offerts ajoutés à votre compte.')
+      toast.success(`Compte créé avec succès ! ${WELCOME_CREDITS} crédits offerts ajoutés à votre compte.`)
       window.location.href = '/dashboard'
     }
 
@@ -100,14 +101,14 @@ export default function LoginPage() {
         <CardHeader className="space-y-2 text-center pb-3">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-700 self-center border border-emerald-500/20">
             <Coins className="w-3.5 h-3.5" />
-            <span>20 crédits offerts à la création</span>
+            <span>{WELCOME_CREDITS} crédits offerts à la création</span>
           </div>
           <CardTitle className="text-2xl font-black text-slate-900 tracking-tight">
             {isSignUp ? 'Créer un compte' : 'Connexion à Laplead'}
           </CardTitle>
           <CardDescription className="text-slate-500 text-xs sm:text-sm">
             {isSignUp
-              ? 'Créez votre compte en 10 secondes et recevez vos 20 crédits gratuits.'
+              ? `Créez votre compte en 10 secondes et recevez vos ${WELCOME_CREDITS} crédits gratuits.`
               : 'Accédez à votre cockpit de prospection B2B et vos leads qualifiés.'}
           </CardDescription>
 

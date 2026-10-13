@@ -8,17 +8,18 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { AFRICAN_COUNTRIES } from '@/lib/africa'
 import { createSearch } from '@/actions/searches'
+import { CREDITS_PER_SEARCH } from '@/lib/pricing'
 import Link from 'next/link'
 import { Search, Loader2, Sparkles, MapPin, Zap, AlertTriangle, ArrowRight, Coins } from 'lucide-react'
 
 const SUGGESTIONS = ['Dentiste', 'Pharmacie', 'Restaurant', 'Clinique', 'Boulangerie', 'Hôtel', 'Immobilier', 'École']
 
 const VOLUME_OPTIONS = [
-  { value: '10', leads: '10 leads', credits: '10 crédits' },
-  { value: '20', leads: '20 leads', credits: '20 crédits' },
-  { value: '50', leads: '50 leads', credits: '50 crédits', popular: true },
-  { value: '100', leads: '100 leads', credits: '100 crédits' },
-  { value: '200', leads: '200 leads', credits: '200 crédits' },
+  { value: '10', leads: '10 leads' },
+  { value: '20', leads: '20 leads' },
+  { value: '50', leads: '50 leads', popular: true },
+  { value: '100', leads: '100 leads' },
+  { value: '200', leads: '200 leads' },
 ]
 
 export function SearchForm({ userCredits = 0 }: { userCredits?: number }) {
@@ -113,11 +114,10 @@ export function SearchForm({ userCredits = 0 }: { userCredits?: number }) {
                   key={sug}
                   type="button"
                   onClick={() => setSecteur(sug)}
-                  className={`text-[11px] px-2.5 py-1 rounded-lg font-semibold transition-all ${
-                    secteur.toLowerCase() === sug.toLowerCase()
+                  className={`text-[11px] px-2.5 py-1 rounded-lg font-semibold transition-all ${secteur.toLowerCase() === sug.toLowerCase()
                       ? 'bg-[#f05a5a] text-white shadow-xs'
                       : 'bg-slate-100 text-slate-600 hover:bg-slate-200/80 hover:text-slate-900'
-                  }`}
+                    }`}
                 >
                   {sug}
                 </button>
@@ -208,7 +208,7 @@ export function SearchForm({ userCredits = 0 }: { userCredits?: number }) {
               <Label htmlFor="max_results" className="text-xs font-bold text-slate-700 uppercase tracking-wider">
                 Volume de leads
               </Label>
-              <span className="text-[11px] text-slate-400 font-medium">1 crédit par lead</span>
+              <span className="text-[11px] text-slate-400 font-medium">{CREDITS_PER_SEARCH} crédits par recherche</span>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-0.5">
@@ -219,11 +219,10 @@ export function SearchForm({ userCredits = 0 }: { userCredits?: number }) {
                     key={opt.value}
                     type="button"
                     onClick={() => setMaxResults(opt.value)}
-                    className={`relative flex flex-col items-center justify-center py-2.5 px-2 rounded-xl border text-center transition-all cursor-pointer ${
-                      isSelected
+                    className={`relative flex flex-col items-center justify-center py-2.5 px-2 rounded-xl border text-center transition-all cursor-pointer ${isSelected
                         ? 'bg-red-50/80 border-[#f05a5a] text-[#f05a5a] shadow-xs ring-2 ring-[#f05a5a]/20 font-bold'
                         : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50 font-medium'
-                    }`}
+                      }`}
                   >
                     {opt.popular && (
                       <span className="absolute -top-2 right-2 text-[9px] font-black uppercase tracking-wider bg-[#f05a5a] text-white px-1.5 py-0.2 rounded-full shadow-xs">
@@ -232,7 +231,7 @@ export function SearchForm({ userCredits = 0 }: { userCredits?: number }) {
                     )}
                     <span className="text-xs sm:text-sm font-extrabold">{opt.leads}</span>
                     <span className={`text-[10px] sm:text-[11px] mt-0.5 ${isSelected ? 'text-[#f05a5a] font-semibold' : 'text-slate-400'}`}>
-                      {opt.credits}
+                      {CREDITS_PER_SEARCH} crédits
                     </span>
                   </button>
                 )
@@ -242,12 +241,12 @@ export function SearchForm({ userCredits = 0 }: { userCredits?: number }) {
           </div>
 
           {/* Alerte Solde de Crédits */}
-          {userCredits < parseInt(maxResults, 10) && (
+          {userCredits < CREDITS_PER_SEARCH && (
             <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
               <div className="flex items-start sm:items-center gap-2">
                 <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5 sm:mt-0" />
                 <span>
-                  Solde insuffisant : vous avez <strong>{userCredits} crédit{userCredits > 1 ? 's' : ''}</strong> sur <strong>{maxResults}</strong> requis.
+                  Solde insuffisant : vous avez <strong>{userCredits} crédit{userCredits > 1 ? 's' : ''}</strong> sur <strong>{CREDITS_PER_SEARCH}</strong> requis.
                 </span>
               </div>
               <Link
@@ -261,7 +260,7 @@ export function SearchForm({ userCredits = 0 }: { userCredits?: number }) {
           )}
 
           {/* Bouton de soumission */}
-          {userCredits < parseInt(maxResults, 10) ? (
+          {userCredits < CREDITS_PER_SEARCH ? (
             <Link href="/billing" className="w-full">
               <Button
                 type="button"
@@ -292,7 +291,7 @@ export function SearchForm({ userCredits = 0 }: { userCredits?: number }) {
           )}
 
           <p className="text-[11px] text-center text-slate-400">
-            Dédoublonnage automatique & déduction au résultat effectif.
+            Dédoublonnage automatique & remboursement intégral si aucun lead n&apos;est trouvé.
           </p>
         </form>
       </CardContent>

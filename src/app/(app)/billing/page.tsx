@@ -1,68 +1,42 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Check, Coins, Zap, ShieldCheck, ArrowRight, Sparkles, Smartphone, CreditCard, History, AlertCircle } from 'lucide-react'
+import { Check, Coins, ShieldCheck, Sparkles, CreditCard, History, AlertCircle } from 'lucide-react'
 import { connection } from 'next/server'
+import { buyCredits } from '@/actions/billing'
+import { BuyPackButton } from '@/components/billing/BuyPackButton'
+import { CREDIT_PACKS, CREDITS_PER_SEARCH, searchesFor } from '@/lib/pricing'
 
-const PACKS = [
-  {
-    id: 'pack_starter',
-    name: 'Pack Découverte',
-    credits: 100,
-    price: 5000,
-    currency: 'FCFA',
-    description: 'Parfait pour tester une première campagne locale ciblée.',
-    popular: false,
-    color: 'from-blue-500/10 to-indigo-500/5',
-    features: [
-      '100 leads complets avec téléphones vérifiés',
-      'Extraction directe Google Maps & Annuaire',
-      'Pitchs personnalisés WhatsApp & Email via IA',
-      'Export CSV illimité en 1 clic',
-      'Validité des crédits à vie',
-    ],
+const ERROR_MESSAGES: Record<string, { title: string; text: string }> = {
+  insufficient_credits: {
+    title: 'Crédits de prospection épuisés',
+    text: `Chaque génération de leads coûte ${CREDITS_PER_SEARCH} crédits. Choisissez un pack ci-dessous pour relancer vos extractions immédiatement.`,
   },
-  {
-    id: 'pack_pro',
-    name: 'Pack Croissance Pro',
-    credits: 500,
-    price: 20000,
-    currency: 'FCFA',
-    description: 'Le choix privilégié des commerciaux et agences en expansion.',
-    popular: true,
-    color: 'from-[#E55B5B]/15 to-[#F05A5A]/5',
-    badge: 'Le Plus Populaire',
-    features: [
-      '500 leads hautement qualifiés (WhatsApp direct)',
-      'Déduplication automatique intelligente',
-      'Génération copywriting IA en Français & Wolof',
-      'Lien WhatsApp clic-et-contact instantané',
-      'Extraction multi-villes et quartiers',
-      'Support prioritaire par WhatsApp dédié',
-    ],
+  payment_init: {
+    title: 'Le paiement n\'a pas pu démarrer',
+    text: 'Moneroo n\'a pas répondu correctement. Aucun montant n\'a été débité, réessayez dans un instant.',
   },
-  {
-    id: 'pack_business',
-    name: 'Pack Entreprise',
-    credits: 1500,
-    price: 50000,
-    currency: 'FCFA',
-    description: 'Pour les équipes de vente et agences à gros volume panafricain.',
-    popular: false,
-    color: 'from-emerald-500/10 to-teal-500/5',
-    badge: 'Meilleur Coût / Lead',
-    features: [
-      '1 500 leads complets sur les 54 pays africains',
-      'Coût par lead le plus bas (33 FCFA / prospect)',
-      'Détection automatique des contacts décideurs',
-      'Multi-utilisateurs & partage de listes',
-      'Accès anticipé aux nouveaux modèles IA',
-      'Account Manager dédié 7j/7',
-    ],
+  invalid_pack: {
+    title: 'Pack introuvable',
+    text: 'Le pack sélectionné n\'existe plus. Choisissez un pack ci-dessous.',
   },
-]
+  email_required: {
+    title: 'Email requis',
+    text: 'Moneroo exige une adresse email pour le reçu de paiement. Connectez-vous avec un compte email.',
+  },
+}
+
+const MOTIF_LABELS: Record<string, string> = {
+  bonus: 'Bonus de bienvenue',
+  bonus_bienvenue: 'Bonus de bienvenue',
+  achat_moneroo: 'Achat de crédits (Moneroo)',
+  reservation_recherche: 'Génération de leads',
+  remboursement: 'Remboursement',
+  remboursement_non_utilises: 'Remboursement (aucun résultat)',
+  remboursement_credits_non_utilises: 'Remboursement (aucun résultat)',
+  remboursement_echec_recherche: 'Remboursement (échec recherche)',
+  erreur: 'Remboursement (incident technique)',
+}
 
 const PAYMENT_METHODS = [
   { name: 'Wave', color: 'bg-[#1DC4FF]/10 text-[#1DC4FF] border-[#1DC4FF]/30' },
@@ -80,6 +54,7 @@ interface BillingPageProps {
 export default async function BillingPage({ searchParams }: BillingPageProps) {
   await connection()
   const resolvedSearchParams = searchParams ? await searchParams : {}
+  const errorMessage = resolvedSearchParams.error ? ERROR_MESSAGES[resolvedSearchParams.error] : undefined
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -102,17 +77,15 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
 
   return (
     <div className="container max-w-7xl mx-auto py-10 px-4 md:px-8 space-y-10">
-      {/* Alerte Crédits Insuffisants */}
-      {resolvedSearchParams.error === 'insufficient_credits' && (
+      {/* Alertes (crédits insuffisants, échec d'initialisation Moneroo…) */}
+      {errorMessage && (
         <div className="p-4 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-200 flex items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
           <div className="p-2 rounded-xl bg-amber-500/20 text-amber-400 shrink-0">
             <AlertCircle className="w-5 h-5" />
           </div>
           <div>
-            <h4 className="font-bold text-sm text-white">Crédits de prospection épuisés</h4>
-            <p className="text-xs text-amber-200/90 mt-0.5">
-              Votre solde est insuffisant pour lancer cette recherche. Choisissez un pack de crédits ci-dessous pour démarrer vos extractions immédiatement.
-            </p>
+            <h4 className="font-bold text-sm text-white">{errorMessage.title}</h4>
+            <p className="text-xs text-amber-200/90 mt-0.5">{errorMessage.text}</p>
           </div>
         </div>
       )}
@@ -129,7 +102,7 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
               Packs de <span className="text-[#F05A5A]">Crédits</span> Prospection
             </h1>
             <p className="text-slate-300 text-sm md:text-base max-w-2xl leading-relaxed">
-              1 crédit = 1 prospect B2B complet avec téléphone, localisation et message de contact rédigé par IA. Aucun abonnement mensuel, vos crédits n'expirent jamais.
+              Chaque génération de leads coûte {CREDITS_PER_SEARCH} crédits, quel que soit le volume, et elle est intégralement remboursée si elle ne trouve aucun prospect. Paiement sécurisé par Moneroo, sans abonnement, et vos crédits n&apos;expirent jamais.
             </p>
           </div>
 
@@ -150,14 +123,13 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
 
       {/* Grille des offres */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
-        {PACKS.map((pack) => (
+        {CREDIT_PACKS.map((pack) => (
           <div
             key={pack.id}
-            className={`relative flex flex-col justify-between rounded-3xl p-8 transition-all duration-300 ${
-              pack.popular
+            className={`relative flex flex-col justify-between rounded-3xl p-8 transition-all duration-300 ${pack.popular
                 ? 'bg-gradient-to-b from-white to-slate-50 text-slate-900 border-2 border-[#E55B5B] shadow-2xl md:-translate-y-2'
                 : 'bg-white/[0.04] text-white border border-white/10 hover:border-white/20 backdrop-blur-md'
-            }`}
+              }`}
           >
             {pack.badge && (
               <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
@@ -183,12 +155,12 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
                     {pack.price.toLocaleString('fr-FR')}
                   </span>
                   <span className={`text-sm font-bold uppercase ${pack.popular ? 'text-slate-600' : 'text-slate-400'}`}>
-                    {pack.currency}
+                    FCFA
                   </span>
                 </div>
                 <div className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
                   <Coins className="w-3.5 h-3.5" />
-                  <span>{pack.credits} crédits ({Math.round(pack.price / pack.credits)} FCFA / lead)</span>
+                  <span>{pack.credits.toLocaleString('fr-FR')} crédits ≈ {searchesFor(pack.credits)} générations de leads</span>
                 </div>
               </div>
 
@@ -206,19 +178,10 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
               </div>
             </div>
 
-            <div className="pt-8 mt-auto">
-              <Button
-                className={`w-full font-bold h-12 rounded-xl transition-all text-base ${
-                  pack.popular
-                    ? 'bg-[#E55B5B] hover:bg-[#d64a4a] text-white shadow-xl shadow-[#E55B5B]/30'
-                    : 'bg-white/10 hover:bg-white/20 text-white border border-white/15'
-                }`}
-              >
-                <Smartphone className="w-4 h-4 mr-2" />
-                Payer par Mobile Money
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </div>
+            <form action={buyCredits} className="pt-8 mt-auto">
+              <input type="hidden" name="pack_id" value={pack.id} />
+              <BuyPackButton popular={pack.popular} />
+            </form>
           </div>
         ))}
       </div>
@@ -269,7 +232,7 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
               {transactions.map((tx) => (
                 <div key={tx.id} className="flex items-center justify-between p-4 px-6 hover:bg-white/[0.03] transition-colors">
                   <div className="space-y-1">
-                    <p className="font-semibold text-white capitalize">{tx.motif}</p>
+                    <p className="font-semibold text-white">{MOTIF_LABELS[tx.motif] ?? tx.motif}</p>
                     <p className="text-xs text-slate-400 font-mono">
                       {new Date(tx.created_at).toLocaleDateString('fr-FR', {
                         day: '2-digit',
@@ -282,11 +245,10 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
                   </div>
                   <Badge
                     variant={tx.amount > 0 ? 'default' : 'secondary'}
-                    className={`font-mono text-xs font-bold px-3 py-1 rounded-full ${
-                      tx.amount > 0
+                    className={`font-mono text-xs font-bold px-3 py-1 rounded-full ${tx.amount > 0
                         ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
                         : 'bg-white/10 text-slate-300 border border-white/10'
-                    }`}
+                      }`}
                   >
                     {tx.amount > 0 ? `+${tx.amount}` : tx.amount} crédits
                   </Badge>

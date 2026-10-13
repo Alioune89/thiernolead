@@ -48,7 +48,6 @@ export async function POST(request: Request) {
 
     // Récupérer les résultats complets d'Apify
     const { items } = await getRunData(runId)
-    const costPerLead = search.with_emails ? 2 : 1
 
     // Normaliser les données (nettoyage des numéros de téléphone etc.)
     const formattedLeads = normalizeLeads(items, searchId, search.user_id)
@@ -64,10 +63,10 @@ export async function POST(request: Request) {
       }
     }
 
-    // Calculer les crédits non utilisés
+    // Coût fixe par recherche : facturé dès qu'au moins un lead est trouvé, sinon remboursé en totalité
     const leadsCount = formattedLeads.length
-    const creditsUsed = leadsCount * costPerLead
-    const creditsRefund = Math.max(0, search.credits_reserved - creditsUsed)
+    const creditsUsed = leadsCount > 0 ? search.credits_reserved : 0
+    const creditsRefund = search.credits_reserved - creditsUsed
 
     // Rembourser les crédits non utilisés
     if (creditsRefund > 0) {
@@ -81,8 +80,8 @@ export async function POST(request: Request) {
     // Marquer la recherche comme terminée
     await supabase
       .from('searches')
-      .update({ 
-        statut: 'succeeded', 
+      .update({
+        statut: 'succeeded',
         results_count: leadsCount,
         credits_billed: creditsUsed
       })

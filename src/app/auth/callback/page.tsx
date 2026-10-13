@@ -14,11 +14,11 @@ export default function AuthCallbackPage() {
     const handleCallback = async () => {
       // Le simple fait d'initialiser le client déclenche le traitement de l'URL
       // (Supabase intercepte le ?code= ou le #access_token= et sauvegarde la session)
-      
+
       // On attend une petite seconde pour laisser Supabase écrire les cookies
       setTimeout(async () => {
         const { data: { user } } = await supabase.auth.getUser()
-        
+
         if (user) {
           router.push('/dashboard')
           router.refresh()

@@ -75,11 +75,10 @@ export default async function SettingsPage() {
 
           <div className="hidden md:flex flex-col items-end gap-1 text-xs">
             <span className="text-slate-400">Statut du profil :</span>
-            <span className={`inline-flex items-center gap-1.5 font-bold px-3 py-1 rounded-full ${
-              profile?.onboarded
-                ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
-                : 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
-            }`}>
+            <span className={`inline-flex items-center gap-1.5 font-bold px-3 py-1 rounded-full ${profile?.onboarded
+              ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+              : 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
+              }`}>
               <CheckCircle2 className="w-3.5 h-3.5" />
               {profile?.onboarded ? 'Profil Complet' : 'Configuration requise'}
             </span>

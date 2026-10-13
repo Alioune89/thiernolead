@@ -24,6 +24,7 @@ import {
   Download,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
+import { CREDITS_PER_SEARCH, WELCOME_CREDITS, searchesFor } from '@/lib/pricing'
 
 export const dynamic = 'force-dynamic'
 
@@ -117,7 +118,7 @@ export default async function LandingPage() {
             </Link>
             <div className="flex items-center justify-center text-center gap-2 text-[11px] sm:text-sm text-slate-300 bg-white/5 border border-white/10 px-3.5 py-2.5 sm:py-3.5 rounded-2xl max-w-full">
               <Coins className="w-4 h-4 text-[#F05A5A] shrink-0" />
-              <span><strong>20 crédits offerts</strong> • Sans carte bancaire</span>
+              <span><strong>{WELCOME_CREDITS} crédits offerts</strong> • Sans carte bancaire</span>
             </div>
           </div>
 
@@ -545,7 +546,7 @@ export default async function LandingPage() {
               Payez uniquement ce que vous consommez
             </h3>
             <p className="text-slate-400 max-w-xl mx-auto text-sm md:text-base">
-              Pas de factures récurrentes. Achetez des packs de crédits valables à vie.
+              Pas de factures récurrentes. {CREDITS_PER_SEARCH} crédits par génération de leads, packs valables à vie.
             </p>
           </div>
 
@@ -558,7 +559,7 @@ export default async function LandingPage() {
                   <span className="text-4xl font-black text-white font-mono">5 000</span>
                   <span className="text-sm font-bold text-slate-400">FCFA</span>
                 </div>
-                <p className="text-xs text-emerald-400 font-semibold mt-1">100 crédits (50 FCFA / lead)</p>
+                <p className="text-xs text-emerald-400 font-semibold mt-1">100 crédits ≈ {searchesFor(100)} générations de leads</p>
               </div>
 
               <Link href={user ? '/billing' : '/login'}>
@@ -579,7 +580,7 @@ export default async function LandingPage() {
                   <span className="text-4xl font-black text-slate-900 font-mono">20 000</span>
                   <span className="text-sm font-bold text-slate-600">FCFA</span>
                 </div>
-                <p className="text-xs text-[#E55B5B] font-bold mt-1">500 crédits (40 FCFA / lead)</p>
+                <p className="text-xs text-[#E55B5B] font-bold mt-1">500 crédits ≈ {searchesFor(500)} générations de leads</p>
               </div>
 
               <Link href={user ? '/billing' : '/login'}>
@@ -597,7 +598,7 @@ export default async function LandingPage() {
                   <span className="text-4xl font-black text-white font-mono">50 000</span>
                   <span className="text-sm font-bold text-slate-400">FCFA</span>
                 </div>
-                <p className="text-xs text-emerald-400 font-semibold mt-1">1 500 crédits (33 FCFA / lead)</p>
+                <p className="text-xs text-emerald-400 font-semibold mt-1">1 500 crédits ≈ {searchesFor(1500)} générations de leads</p>
               </div>
 
               <Link href={user ? '/billing' : '/login'}>
@@ -616,7 +617,7 @@ export default async function LandingPage() {
               Prêt à accélérer vos ventes en Afrique dès aujourd'hui ?
             </h3>
             <p className="text-slate-300 max-w-xl text-base">
-              Créez votre compte en 10 secondes et recevez <strong className="text-white">20 crédits gratuits</strong> pour extraire vos premiers prospects.
+              Créez votre compte en 10 secondes et recevez <strong className="text-white">{WELCOME_CREDITS} crédits gratuits</strong> pour lancer votre première génération de leads.
             </p>
             <Link href={targetHref}>
               <Button

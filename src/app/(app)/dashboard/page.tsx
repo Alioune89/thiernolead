@@ -174,18 +174,16 @@ export default async function DashboardPage() {
                             {search.secteur}
                           </h3>
                           <Badge
-                            className={`text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shrink-0 ${
-                              isSucceeded
+                            className={`text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shrink-0 ${isSucceeded
                                 ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
                                 : isRunning
-                                ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30 animate-pulse'
-                                : 'bg-red-500/15 text-red-400 border border-red-500/30'
-                            }`}
+                                  ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30 animate-pulse'
+                                  : 'bg-red-500/15 text-red-400 border border-red-500/30'
+                              }`}
                           >
                             <span
-                              className={`w-1.5 h-1.5 rounded-full ${
-                                isSucceeded ? 'bg-emerald-400' : isRunning ? 'bg-amber-400' : 'bg-red-400'
-                              }`}
+                              className={`w-1.5 h-1.5 rounded-full ${isSucceeded ? 'bg-emerald-400' : isRunning ? 'bg-amber-400' : 'bg-red-400'
+                                }`}
                             />
                             {isSucceeded ? 'Prêt' : isRunning ? 'En cours' : 'Échec'}
                           </Badge>
