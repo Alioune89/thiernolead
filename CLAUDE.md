@@ -88,6 +88,12 @@ Laplead is the only merchant, so there's no encrypted per-merchant key storage: 
 
 `payments.statut`: `pending | completed | failed`. The legacy `apply_payment` RPC is unused.
 
+**Sandbox / local testing:**
+- Moneroo's built-in "Test Payment Gateway" only accepts **USD**. XOF in sandbox needs a third-party gateway (PayDunya, KkiaPay…) connected with that provider's test credentials.
+- For local tests, `MONEROO_TEST_CURRENCY=USD` in `.env.local` makes `getCheckoutPrice` charge the pack price converted at 600 XOF/USD. The `payments` row stores that amount and currency, so the amount check in `settleMonerooPayment` still matches. This mode is ignored when `NODE_ENV === 'production'`.
+- The test phone numbers are (414) 951-8161 (success) and (414) 951-8163 (failure).
+- To receive webhooks locally, run `ngrok http 3000` and point a second Moneroo webhook at `<ngrok-url>/api/webhooks/moneroo`, using the same secret as `.env.local`. Set `NEXT_PUBLIC_APP_URL` to the ngrok URL. `next.config.ts` allows `*.ngrok-free.*` through `allowedDevOrigins`; Next 16 blocks other dev origins otherwise.
+
 Other unfinished pieces: `/api/cron/reconcile` is a stub, and these files are empty placeholders: `src/actions/{leads,messages,profile}.ts` and `src/lib/{csv,prompts,validations}.ts`.
 
 ### Data model

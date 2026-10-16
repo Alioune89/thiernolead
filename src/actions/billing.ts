@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { initiateMonerooPayment } from '@/lib/moneroo'
-import { CURRENCY, getPack } from '@/lib/pricing'
+import { CURRENCY, getPack, type CreditPack } from '@/lib/pricing'
 
 async function getAppUrl() {
   if (process.env.NEXT_PUBLIC_APP_URL) return process.env.NEXT_PUBLIC_APP_URL.replace(/\/$/, '')
@@ -13,6 +13,18 @@ async function getAppUrl() {
   const host = h.get('x-forwarded-host') ?? h.get('host')
   const proto = h.get('x-forwarded-proto') ?? 'https'
   return `${proto}://${host}`
+}
+
+// Mode test local : la passerelle de test Moneroo n'accepte que l'USD en sandbox.
+// MONEROO_TEST_CURRENCY=USD (dans .env.local uniquement) facture l'équivalent en dollars.
+// Jamais actif en production, même si la variable y était définie par erreur.
+const XOF_PER_USD = 600
+
+function getCheckoutPrice(pack: CreditPack): { amount: number; currency: string } {
+  if (process.env.NODE_ENV !== 'production' && process.env.MONEROO_TEST_CURRENCY === 'USD') {
+    return { amount: Math.max(1, Math.ceil(pack.price / XOF_PER_USD)), currency: 'USD' }
+  }
+  return { amount: pack.price, currency: CURRENCY }
 }
 
 export async function buyCredits(formData: FormData) {
@@ -28,6 +40,7 @@ export async function buyCredits(formData: FormData) {
   if (!user.email) redirect('/billing?error=email_required')
 
   const adminSupabase = createAdminClient()
+  const { amount, currency } = getCheckoutPrice(pack)
 
   const { data: profile } = await adminSupabase
     .from('profiles')
@@ -42,8 +55,8 @@ export async function buyCredits(formData: FormData) {
       user_id: user.id,
       provider: 'moneroo',
       pack: pack.id,
-      montant: pack.price,
-      devise: CURRENCY,
+      montant: amount,
+      devise: currency,
       credits: pack.credits,
       statut: 'pending',
     })
@@ -59,9 +72,9 @@ export async function buyCredits(formData: FormData) {
   // "ref" et non "paymentId" : Moneroo ajoute son propre ?paymentId=… à l'URL de retour.
   const appUrl = await getAppUrl()
   const result = await initiateMonerooPayment({
-    amount: pack.price,
-    currency: CURRENCY,
-    description: `Laplead — ${pack.name} (${pack.credits} crédits)`,
+    amount,
+    currency,
+    description: `Laplead — ${pack.name} (${pack.credits} crédits)${currency === CURRENCY ? '' : ' [TEST]'}`,
     returnUrl: `${appUrl}/billing/retour?ref=${payment.id}`,
     customerEmail: user.email,
     customerName: profile?.nom_expediteur ?? undefined,
