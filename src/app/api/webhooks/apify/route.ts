@@ -1,95 +1,27 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-import { getRunData } from '@/lib/apify'
-import { normalizeLeads } from '@/lib/normalize'
+import { reconcileSearch } from '@/lib/search-runs'
 
-// On utilise le Service Role Key car le webhook vient de l'extérieur sans session auth
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SECRET_KEY!
-)
+export const dynamic = 'force-dynamic'
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+// Webhook ad hoc enregistré par startGoogleMapsScraper (seulement si APIFY_WEBHOOK_SECRET est défini).
+// Il accélère la finalisation quand personne ne regarde la page ; le polling suffit sans lui.
 export async function POST(request: Request) {
-  const url = new URL(request.url)
-  const secret = url.searchParams.get('secret')
+  const expected = process.env.APIFY_WEBHOOK_SECRET
+  const secret = new URL(request.url).searchParams.get('secret')
 
-  if (secret !== process.env.APIFY_WEBHOOK_SECRET) {
+  if (!expected || secret !== expected) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  try {
-    const body = await request.json()
-    const { runId, status, searchId } = body
-
-    if (!runId || !searchId) {
-      return NextResponse.json({ error: 'Missing parameters' }, { status: 400 })
-    }
-
-    const { data: search } = await supabase
-      .from('searches')
-      .select('*')
-      .eq('id', searchId)
-      .single()
-
-    if (!search || search.statut !== 'running') {
-      return NextResponse.json({ message: 'Recherche ignorée (déjà traitée ou introuvable)' }, { status: 200 })
-    }
-
-    if (status !== 'SUCCEEDED') {
-      await supabase.from('searches').update({ statut: 'failed' }).eq('id', searchId)
-      // Rembourser l'utilisateur
-      await supabase.rpc('add_credits', {
-        user_id_param: search.user_id,
-        amount: search.credits_reserved,
-        motif_param: 'remboursement_echec_recherche'
-      })
-      return NextResponse.json({ message: 'Marqué comme failed' }, { status: 200 })
-    }
-
-    // Récupérer les résultats complets d'Apify
-    const { items } = await getRunData(runId)
-
-    // Normaliser les données (nettoyage des numéros de téléphone etc.)
-    const formattedLeads = normalizeLeads(items, searchId, search.user_id)
-
-    if (formattedLeads.length > 0) {
-      // Upsert des leads (pour ignorer les doublons via la contrainte UNIQUE (search_id, place_id))
-      const { error: insertError } = await supabase
-        .from('leads')
-        .upsert(formattedLeads, { onConflict: 'search_id,place_id', ignoreDuplicates: true })
-
-      if (insertError) {
-        console.error("Erreur insertion leads:", insertError)
-      }
-    }
-
-    // Coût fixe par recherche : facturé dès qu'au moins un lead est trouvé, sinon remboursé en totalité
-    const leadsCount = formattedLeads.length
-    const creditsUsed = leadsCount > 0 ? search.credits_reserved : 0
-    const creditsRefund = search.credits_reserved - creditsUsed
-
-    // Rembourser les crédits non utilisés
-    if (creditsRefund > 0) {
-      await supabase.rpc('add_credits', {
-        user_id_param: search.user_id,
-        amount: creditsRefund,
-        motif_param: 'remboursement_credits_non_utilises',
-      })
-    }
-
-    // Marquer la recherche comme terminée
-    await supabase
-      .from('searches')
-      .update({
-        statut: 'succeeded',
-        results_count: leadsCount,
-        credits_billed: creditsUsed
-      })
-      .eq('id', searchId)
-
-    return NextResponse.json({ success: true, count: leadsCount }, { status: 200 })
-  } catch (error) {
-    console.error("Webhook error:", error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  const body = (await request.json().catch(() => null)) as { searchId?: unknown } | null
+  const searchId = body?.searchId
+  if (typeof searchId !== 'string' || !UUID_RE.test(searchId)) {
+    return NextResponse.json({ error: 'Missing parameters' }, { status: 400 })
   }
+
+  // Le corps n'est qu'un déclencheur : le statut réel du run est relu chez Apify.
+  await reconcileSearch(searchId)
+  return NextResponse.json({ received: true })
 }

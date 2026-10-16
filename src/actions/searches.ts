@@ -2,8 +2,9 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { runGoogleMapsScraperSync } from '@/lib/apify'
-import { normalizeLeads } from '@/lib/normalize'
+import { startGoogleMapsScraper } from '@/lib/apify'
+import { failSearch } from '@/lib/search-runs'
+import { getAppUrl } from '@/lib/app-url'
 import { CREDITS_PER_SEARCH, SEARCH_VOLUMES } from '@/lib/pricing'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
@@ -60,51 +61,30 @@ export async function createSearch(formData: FormData) {
     throw new Error('Erreur de création: ' + (searchError?.message || 'Inconnue'))
   }
 
-  // On lance l'opération d'extraction en asynchrone (non-bloquant pour la réponse HTTP)
-  process.nextTick(async () => {
+  // 3. Démarrer le run Apify (~1 s) sans attendre sa fin. Rien ne tourne en arrière-plan :
+  // sur Vercel la fonction est gelée dès la réponse envoyée, ce qui bloquait les recherches
+  // « En cours » (surtout sur mobile, où la page est mise en veille). La fin du run est détectée
+  // par reconcileSearch (polling de la page, dashboard, webhook Apify).
+  try {
+    const webhookSecret = process.env.APIFY_WEBHOOK_SECRET
+    const runId = await startGoogleMapsScraper({
+      searchId: search.id,
+      sector: secteur,
+      city: ville,
+      country: pays,
+      maxResults,
+      withEmails,
+      webhookUrl: webhookSecret
+        ? `${await getAppUrl()}/api/webhooks/apify?secret=${encodeURIComponent(webhookSecret)}`
+        : undefined,
+    })
+    await adminSupabase.from('searches').update({ apify_run_id: runId }).eq('id', search.id)
+  } catch (error) {
+    console.error('Erreur démarrage Apify:', error)
+    await failSearch(search, "L'extraction n'a pas pu démarrer. Relancez la recherche.")
+  }
 
-    try {
-      const { runId, items } = await runGoogleMapsScraperSync({
-        searchId: search.id,
-        sector: secteur,
-        city: ville,
-        country: pays,
-        maxResults,
-        withEmails,
-      })
-
-      const formattedLeads = normalizeLeads(items, search.id, search.user_id)
-
-      if (formattedLeads.length > 0) {
-        await adminSupabase.from('leads').upsert(formattedLeads, { onConflict: 'search_id,place_id', ignoreDuplicates: true })
-      }
-
-      // Garantie zéro perte : une recherche sans aucun lead est intégralement remboursée.
-      const leadsCount = formattedLeads.length
-      const creditsUsed = leadsCount > 0 ? search.credits_reserved : 0
-      const creditsRefund = search.credits_reserved - creditsUsed
-
-      if (creditsRefund > 0) {
-        await adminSupabase.rpc('add_credits', {
-          user_id_param: search.user_id,
-          amount: creditsRefund,
-          motif_param: 'remboursement_non_utilises',
-        })
-      }
-
-      await adminSupabase
-        .from('searches')
-        .update({ statut: 'succeeded', results_count: leadsCount, credits_billed: creditsUsed, apify_run_id: runId })
-        .eq('id', search.id)
-
-    } catch (error) {
-      console.error("Erreur Apify Background:", error)
-      await adminSupabase.rpc('add_credits', { user_id_param: search.user_id, amount: totalCost, motif_param: 'erreur' })
-      await adminSupabase.from('searches').update({ statut: 'failed' }).eq('id', search.id)
-    }
-  })
-
-  // 3. Rediriger immédiatement l'utilisateur vers la page d'attente
+  // 4. Rediriger immédiatement l'utilisateur vers la page d'attente
   revalidatePath('/dashboard')
   redirect(`/searches/${search.id}`)
 }

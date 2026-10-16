@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { SearchForm } from '@/components/dashboard/SearchForm'
+import { reconcileSearch } from '@/lib/search-runs'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { connection } from 'next/server'
@@ -30,6 +31,17 @@ export default async function DashboardPage() {
   if (!user) redirect('/login')
 
   const adminSupabase = createAdminClient()
+
+  // 0. Finaliser les recherches « En cours » (ex. lancées sur mobile puis page mise en veille),
+  // avant de lire le solde puisqu'un remboursement peut le modifier.
+  const { data: runningSearches } = await adminSupabase
+    .from('searches')
+    .select('id')
+    .eq('user_id', user.id)
+    .eq('statut', 'running')
+  if (runningSearches?.length) {
+    await Promise.all(runningSearches.map((s) => reconcileSearch(s.id)))
+  }
 
   // 1. Récupérer le profil et crédits
   const { data: profile } = await adminSupabase

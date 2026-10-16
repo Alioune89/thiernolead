@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
+import { reconcileSearch } from '@/lib/search-runs'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -19,15 +20,27 @@ export async function GET(
 
   const adminSupabase = createAdminClient()
 
-  const { data: search, error } = await adminSupabase
+  const selectSearch = () => adminSupabase
     .from('searches')
     .select('id, statut, results_count, error, secteur, ville, pays, max_results')
     .eq('id', id)
     .eq('user_id', user.id)
     .single()
 
+  let { data: search, error } = await selectSearch()
+
   if (error || !search) {
     return NextResponse.json({ error: 'Recherche introuvable' }, { status: 404 })
+  }
+
+  // Chaque poll fait avancer la recherche : si le run Apify est terminé, les leads sont enregistrés
+  // et la facturation appliquée ici (aucun travail en arrière-plan côté serveur).
+  if (search.statut === 'running') {
+    await reconcileSearch(search.id)
+    ;({ data: search, error } = await selectSearch())
+    if (error || !search) {
+      return NextResponse.json({ error: 'Recherche introuvable' }, { status: 404 })
+    }
   }
 
   let leads = []

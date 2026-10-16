@@ -54,7 +54,7 @@
 * `src/actions/searches.ts` :
   * Action serveur orchestrant la vérification de l'utilisateur et de son solde de crédits.
   * Déduction / réservation des crédits dans `profiles` et `credit_transactions`.
-  * Lancement synchrone d'Apify Google Maps Scraper (`runGoogleMapsScraperSync`).
+  * Démarrage du run Apify Google Maps Scraper (`startGoogleMapsScraper`) sans attendre sa fin ; la finalisation (leads, facturation, remboursement) est faite par `reconcileSearch` (`src/lib/search-runs.ts`) à chaque poll, à l'ouverture de la page, sur le dashboard ou via le webhook Apify. Rien ne tourne en arrière-plan (Vercel gèle la fonction après la réponse, ce qui bloquait les recherches sur mobile).
   * Déduplication des doublons par `place_id`.
   * Insertion des leads via le client administrateur `createAdminClient()`.
   * **Protection Garantie Zéro Perte :** En cas d'erreur ou de résultat vide, remboursement automatique des crédits à l'utilisateur.

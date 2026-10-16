@@ -50,19 +50,28 @@ The pattern used everywhere is: authenticate with the **server** client (`supaba
 - A search that finds 0 leads, or that fails, is fully refunded. See below.
 
 ### Search lifecycle (the core flow)
-1. `createSearch` in `src/actions/searches.ts` (server action, posted from `SearchForm`):
-   - reserves `max_results × costPerLead` credits;
-   - inserts the `searches` row with `statut: 'running'`;
-   - redirects immediately to `/searches/[id]`.
-2. The scraping itself runs **in-process** inside `process.nextTick`. `runGoogleMapsScraperSync` (`src/lib/apify.ts`) calls the Apify actor `compass/crawler-google-places` with `.call()`, which blocks until the run finishes and then reads the dataset.
-3. The results then go through these steps:
-   - `normalizeLeads` (`src/lib/normalize.ts`) converts phones to E.164 with libphonenumber. The default region is hardcoded to `'SN'`, and `wa.me` links are only created for mobile numbers.
-   - The leads are upserted on the unique `(search_id, place_id)` key, which deduplicates them.
-   - If 0 leads were found, `credits_reserved` is refunded in full. Otherwise the flat cost is billed.
-   - The search is marked `succeeded`. On any exception, the full reservation is refunded and the search is marked `failed`.
-4. `SearchDetailView` (a large client component of about 1000 lines) polls `/api/searches/[id]/status` every 2.5s and does a full `window.location.reload()` when the status leaves `running`.
+**Nothing runs in the background.** The old design ran Apify inside `process.nextTick` after the response was sent. Vercel freezes the function once the response is out, so on mobile, where the page sleeps and stops polling, searches stayed "running" forever and were never refunded. Don't reintroduce background work. If you ever need it, use `after()`.
 
-`/api/webhooks/apify` (secured by the `?secret=APIFY_WEBHOOK_SECRET` query param) has a **duplicate** of the same finalize, refund and mark logic, for asynchronous Apify runs. `createSearch` doesn't register a webhook today. If you change how leads are finalized or refunded, change both places.
+1. `createSearch` in `src/actions/searches.ts` (server action, posted from `SearchForm`):
+   - reserves `CREDITS_PER_SEARCH`;
+   - inserts the `searches` row with `statut: 'running'`;
+   - **starts** the Apify actor `compass/crawler-google-places` through `startGoogleMapsScraper` (`src/lib/apify.ts`). This returns the run id right away, with a 900s actor timeout;
+   - stores `apify_run_id`;
+   - redirects to `/searches/[id]`.
+
+   If `APIFY_WEBHOOK_SECRET` is set, it also registers an ad-hoc Apify webhook pointing at `/api/webhooks/apify`.
+2. `reconcileSearch(searchId)` (`src/lib/search-runs.ts`) is the single place that finishes a search:
+   - it reads the run status from Apify. While the run isn't terminal, it does nothing;
+   - on a terminal status (SUCCEEDED, FAILED, TIMED-OUT, ABORTED), it fetches the dataset and runs `normalizeLeads` (E.164 phone numbers, default region `'SN'`, `wa.me` links only for mobile numbers);
+   - it upserts the leads on `(search_id, place_id)`;
+   - it bills the flat cost, or refunds in full when there are 0 leads.
+
+   Even a run that timed out or was aborted still delivers the leads it found. The `running → succeeded/failed` update is conditional (`.eq('statut','running')`), so concurrent callers refund only once. A `running` search with no `apify_run_id` that is older than 10 minutes is failed and refunded; these are leftovers from the old design.
+3. `reconcileSearch` is called from:
+   - `/api/searches/[id]/status`, which `SearchDetailView` polls every 1.5s before doing `window.location.reload()` once the status leaves `running`;
+   - the `/searches/[id]` page on load;
+   - the dashboard, for all `running` searches;
+   - `/api/webhooks/apify`, protected by `?secret=APIFY_WEBHOOK_SECRET`, whose body is only used as a trigger.
 
 `search_status` enum: `pending | running | succeeded | failed`.
 
